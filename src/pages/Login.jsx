@@ -1,6 +1,7 @@
 import React from 'react'
 import { assets } from '../assets/assets'
 import { Star } from 'lucide-react'
+import { SignIn} from '@clerk/clerk-react'
 
 const Login = () => {
   return (
@@ -14,7 +15,7 @@ const Login = () => {
 
       {/* Left Side */}
       <div className='flex-1 flex flex-col items-start justify-between p-6 md:p-10 lg:pl-40'>
-        <img src={assets.logo} alt="" className='h-24 object-contain' />
+        <img src={assets.logo} alt="" className='h-14 object-contain' />
         <div>
           <div className='flex item-center gap-3 mb-4 max-md:mt-10'>
             <img src={assets.group_users} alt="" className='h-8 md:h-10' />
@@ -40,7 +41,7 @@ const Login = () => {
 
       {/* Right Side */}
       <div className='flex-1 flex items-center justify-center p-6 sm:p-10'>
-
+                <SignIn />
       </div>
 
     </div>

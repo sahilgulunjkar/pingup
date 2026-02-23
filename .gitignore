@@ -22,4 +22,8 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
-links.txt
+
+.env
+.env.local
+node_modules/
+dist/
