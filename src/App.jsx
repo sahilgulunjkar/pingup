@@ -11,13 +11,19 @@ import CreatePost from './pages/CreatePost'
 import Layout from './pages/Layout'
 
 import { useUser } from '@clerk/clerk-react'
+import Loading from './components/Loading'
 
 export const App = () => {
-  const { user } = useUser()
+  const { user, isLoaded } = useUser()
+
+  if (!isLoaded) {
+    return <Loading />
+  }
+
   return (
     <>
       <Routes>
-        <Route path='/' element={ !user ? <Login  /> : <Layout />}>
+        <Route path='/' element={!user ? <Login /> : <Layout />}>
           <Route index element={<Feed />} />
           <Route path='messages' element={<Messages />} />
           <Route path='messages/:userId' element={<ChatBox />} />
