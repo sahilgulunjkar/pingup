@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { dummyPostsData } from '../assets/assets'
 import Loading from '../components/Loading'
 import StoriesBar from '../components/StoriesBar'
+import PostCard from '../components/Postcard'
 
 const Feed = () => {
   const [feeds, setFeeds] = useState([])
