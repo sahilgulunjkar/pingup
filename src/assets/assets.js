@@ -28,7 +28,7 @@ export const dummyUserData = {
     "email": "admin@example.com",
     "full_name": "John Warren",
     "username": "john_warren",
-    "bio": "🌍 Dreamer | 📚 Learner | 🚀 Doer\r\nExploring life one step at a time.\r\n✨ Staying curious. Creating with purpose.",
+    "bio": " Dreamer |  Learner |  Doer\r\nExploring life one step at a time.\r\n Staying curious. Creating with purpose.",
     "profile_picture": sample_profile,
     "cover_photo": sample_cover,
     "location": "New York, NY",
