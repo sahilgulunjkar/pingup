@@ -94,7 +94,7 @@ const Profile = () => {
 
       </div>
       {/* Edit Profile Model */}
-      {showEdit && <p>show profile</p>}
+      {showEdit && <ProfileModel setShowEdit={setShowEdit}/>}
     </div>
   ) : (<Loading />)
 }
