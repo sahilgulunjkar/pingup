@@ -33,15 +33,21 @@ const Messages = () => {
                 {user.bio}
               </p>
             </div>
-            <div className='flex flex-col gap-2 mt-4 '>
-              <button onClick={()=> navigate('/messages/${user._id')} className='size-10 flex items-center justify-center text-sm rounded bg-s1ate-100 hover:bg-s1ate-200 text-slate-800 active:sca1e-95 transition cursor-pointer gap-1'>
-                <MessageSquare className='w-4 h-4' />
-              </button>
-            
-              <button onClick={()=> navigate('/profile/${user._id')} className='size-10 flex items-center justify-center text-sm rounded bg-s1ate-100 hover:bg-s1ate-200 text-slate-800 active:sca1e-95 transition cursor-pointer '>
-                <Eye className='w-4 h-4' />
-              </button>
-            </div>
+            <div className='flex flex-col gap-2 mt-4'>
+  <button
+    onClick={() => navigate(`/messages/${user._id}`)}
+    className='size-10 flex items-center justify-center text-sm rounded bg-slate-100 hover:bg-slate-200 text-slate-800 active:scale-95 transition cursor-pointer gap-1'
+  >
+    <MessageSquare className='w-4 h-4' />
+  </button>
+
+  <button
+    onClick={() => navigate(`/profile/${user._id}`)}
+    className='size-10 flex items-center justify-center text-sm rounded bg-slate-100 hover:bg-slate-200 text-slate-800 active:scale-95 transition cursor-pointer'
+  >
+    <Eye className='w-4 h-4' />
+  </button>
+</div>
 
           </div>
         ))}
