@@ -4,6 +4,7 @@ import { dummyPostsData, dummyUserData } from '../assets/assets'
 import Loading from '../components/Loading'
 import UserProfileInfo from '../components/UserProfileInfo'
 import Postcard from '../components/Postcard'
+import ProfileModal from '../components/ProfileModal'
 import moment from 'moment'
 
 const Profile = () => {
@@ -94,7 +95,7 @@ const Profile = () => {
 
       </div>
       {/* Edit Profile Model */}
-      {showEdit && <p>show profile</p>}
+      {showEdit && <ProfileModal setShowEdit={setShowEdit}/>}
     </div>
   ) : (<Loading />)
 }
