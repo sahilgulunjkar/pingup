@@ -28,7 +28,7 @@ export const dummyUserData = {
     "email": "admin@example.com",
     "full_name": "John Warren",
     "username": "john_warren",
-    "bio": " Dreamer |  Learner |  Doer\r\nExploring life one step at a time.\r\n Staying curious. Creating with purpose.",
+    "bio": "🌍 Dreamer | 📚 Learner | 🚀 Doer\r\nExploring life one step at a time.\r\n✨ Staying curious. Creating with purpose.",
     "profile_picture": sample_profile,
     "cover_photo": sample_cover,
     "location": "New York, NY",
@@ -61,8 +61,7 @@ export const dummyStoriesData = [
     {
         "_id": "68833d466e4b42b685068860",
         "user": dummyUserData,
-        "content": "📌 This isn't the story I wanted to tell… not yet. But if you're reading this, know that something interesting is in motion 🔄. The next post will make more sense 🧩.",
-        "media_url": "",
+        "content": "📌 This isn't the story I wanted to tell… not yet. But if you're reading this, know that something interesting is in motion 🔄. The next post will make more sense 🧩.",        "media_url": "",
         "media_type": "text",
         "background_color": "#4f46e5",
         "createdAt": "2025-07-25T08:16:06.958Z",
@@ -101,8 +100,7 @@ export const dummyStoriesData = [
     {
         "_id": "68833d706e4b42b685068875",
         "user": dummyUserData,
-        "content": "🤫 Not every moment needs to be loud. Sometimes, the best things happen in silence — in drafts 📝, in progress 🧪, in planning 📊. That's where I am right now.",
-        "media_url": "",
+        "content": "🤫 Not every moment needs to be loud. Sometimes, the best things happen in silence — in drafts 📝, in progress 🧪, in planning 📊. That's where I am right now.",        "media_url": "",
         "media_type": "text",
         "background_color": "#4f46e5",
         "createdAt": "2025-07-25T08:16:48.617Z",
@@ -111,8 +109,7 @@ export const dummyStoriesData = [
     {
         "_id": "68833c9e6e4b42b6850687e7",
         "user": dummyUserData,
-        "content": "✨ Something meaningful is on the way. I'm working behind the scenes 🛠️ to bring it all together. This space is just the beginning 🌱. Stay tuned 👀.",
-        "media_url": "",
+        "content": "✨ Something meaningful is on the way. I'm working behind the scenes 🛠️ to bring it all together. This space is just the beginning 🌱. Stay tuned 👀.",        "media_url": "",
         "media_type": "text",
         "background_color": "#4f46e5",
         "createdAt": "2025-07-25T08:13:18.111Z",
@@ -137,8 +134,7 @@ export const dummyPostsData = [
     {
         "_id": "686e6d0407845749500c24cd",
         "user": dummyUserData,
-        "content": "Unlock your potential—every small step counts. Stay consistent, stay focused, and trust the process. Growth takes time, but every day is a new chance to be better than yesterday. 🌱✨\r\n\r\n#Motivation #GrowthMindset #DailyInspiration #StayFocused #LevelUp #PositiveVibes #KeepGoing #SelfImprovement #MindsetMatters #SuccessJourney",
-        "image_urls": [],
+        "content": "Unlock your potential—every small step counts. Stay consistent, stay focused, and trust the process. Growth takes time, but every day is a new chance to be better than yesterday. 🌱✨\r\n\r\n#Motivation #GrowthMindset #DailyInspiration #StayFocused #LevelUp #PositiveVibes #KeepGoing #SelfImprovement #MindsetMatters #SuccessJourney",        "image_urls": [],
         "post_type": "text",
         "likes_count": [],
         "createdAt": "2025-07-09T13:22:12.601Z",
