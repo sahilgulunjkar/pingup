@@ -2,6 +2,7 @@ import express from 'express'
 import cors from 'cors'
 import dotenv from 'dotenv'
 import connectDB from './configs/db.js'
+import { inngest, functions } from "./ingest/index.js"
 
 dotenv.config()
 
@@ -15,6 +16,8 @@ app.use(cors())
 app.get('/', (req, res) => {
     res.send('Server is running')
 })
+
+app.use("/api/inngest", serve({ client: inngest, functions }));
 
 const port = process.env.PORT || 4000
 
