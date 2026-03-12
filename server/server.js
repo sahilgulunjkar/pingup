@@ -2,7 +2,8 @@ import express from 'express'
 import cors from 'cors'
 import dotenv from 'dotenv'
 import connectDB from './configs/db.js'
-import { inngest, functions } from "./ingest/index.js"
+import { inngest, functions } from "./inngest/index.js"
+import { serve } from "inngest/express"
 
 dotenv.config()
 
