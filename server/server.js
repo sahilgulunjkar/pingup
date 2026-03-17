@@ -4,6 +4,7 @@ import dotenv from 'dotenv'
 import connectDB from './configs/db.js'
 import { inngest, functions } from "./inngest/index.js"
 import { serve } from "inngest/express";
+import { clerkMiddleware } from '@clerk/express'
 
 dotenv.config()
 
@@ -13,6 +14,7 @@ await connectDB();
 
 app.use(express.json())
 app.use(cors())
+app.use(clerkMiddleware())
 
 app.get('/', (req, res) => {
     res.send('Server is running')
