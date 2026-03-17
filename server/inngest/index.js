@@ -1,5 +1,6 @@
 import { Inngest } from "inngest";
 import User from "../models/User.js";
+import connectDB from "../configs/db.js"; 
 
 // Create a client to send and receive events
 export const inngest = new Inngest({ id: "pingup-app" });
@@ -10,6 +11,8 @@ const syncUserCreation = inngest.createFunction(
     { event: 'clerk/user.created' },
 
     async ({ event }) => {
+        await connectDB(); // Connect to the database first
+
         const { id, first_name, last_name, email_addresses, image_url } = event.data
         let username = email_addresses[0].email_address.split('@')[0]
 
@@ -38,6 +41,8 @@ const syncUserUpdation = inngest.createFunction (
     { event: 'clerk/user.updated' },
 
     async ({ event }) => {
+        await connectDB(); // Connect to the database first
+
         const { id, first_name, last_name, email_addresses, image_url } = event.data
 
         const updateUserData = {
@@ -56,6 +61,8 @@ const syncUserDeletion = inngest.createFunction (
     { event: 'clerk/user.deleted' },
 
     async ({ event }) => {
+        await connectDB(); // Connect to the database first
+
         const { id } = event.data
 
         await User.findByIdAndDelete(id)
