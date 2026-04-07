@@ -1,6 +1,8 @@
 import { Inngest } from "inngest";
 import User from "../models/User.js";
 import connectDB from "../configs/db.js"; 
+import Connection from "../models/Connection.js";
+import sendEmail from "../configs/nodemailer.js";
 
 // Create a client to send and receive events
 export const inngest = new Inngest({ id: "pingup-app" });
@@ -69,9 +71,39 @@ const syncUserDeletion = inngest.createFunction (
     }
 )
 
+// Inngest function to send remainder when a new connection request is added
+const sendNewConnectionRequestReminder = inngest.createFunction (
+    { id: "send-new-connection-request-reminder" },
+    { event: "connection:request" },
+    async ({ event, step }) => {
+        const {connectionId} = event.data;
+
+        await step.run("send-connection-request-email", async () => {
+            const connection = await Connection.findById(connectionId).populate('from_user_id to_user_id')
+            const subject = `New connection request`
+            const body = `
+            <div style="font-family: sans-serif; padding: 20px; border: 1px solid #ddd; border-radius: 8px;">
+                <h2>Hi ${connection.to_user_id.full_name}</h2>
+                <p>${connection.from_user_id.full_name} sent you a connection request</p>
+                <a href="${process.env.FRONTEND_URL}/connections" style="color:#10b981; text-decoration: none;"> View connection request</a>
+                <br>
+                <p>Thanks, PingUp Team</p>
+            </div>
+            `
+            
+            await sendEmail({
+                to: connection.to_user_id.email,
+                subject,
+                body
+            })
+        })
+    }
+)
+
 // Create an empty array where we'll export future Inngest functions
 export const functions = [
     syncUserCreation,
     syncUserUpdation,
-    syncUserDeletion
+    syncUserDeletion,
+    sendNewConnectionRequestReminder
 ]
