@@ -19,10 +19,10 @@ const handleUpload = (req, res, next) => {
 userRouter.get("/data", protect, getUserData)
 userRouter.post("/update", protect, handleUpload, updateUserData)
 userRouter.post("/discover", protect, discoverUser)
-userRouter.post("/follow", protect, followUser)
-userRouter.post("/unfollow", protect, unfollowUser)
-userRouter.post("/connect", protect, sendConnectionRequest)
-userRouter.post("/accept", protect, acceptConnectionRequest)
+userRouter.post("/follow/:id", protect, followUser)
+userRouter.post("/unfollow/:id", protect, unfollowUser)
+userRouter.post("/connect/:id", protect, sendConnectionRequest)
+userRouter.post("/accept/:id", protect, acceptConnectionRequest)
 userRouter.get("/connections", protect, getuserConnections)
 
 export default userRouter;

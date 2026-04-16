@@ -246,6 +246,14 @@ export const sendConnectionRequest = async (req, res) => {
         });
 
         await connection.save();
+        
+        // Trigger Inngest event for connection reminder
+        const { inngest } = await import("../inngest/index.js")
+        await inngest.send({
+            name: "connection:request",
+            data: { connectionId: connection._id }
+        })
+
         res.json({ success: true, message: "Connection request sent" });
 
     } catch (error) {
@@ -264,7 +272,8 @@ export const getuserConnections = async (req, res) => {
         const followers = user.followers
         const following = user.following
 
-        const pendingConnections = await Connection.find({to_user_id: userId, status: 'pending'}).populate('from_user_id').map(connection=>connection.from_user_id)
+        const pendingConnectionsRequest = await Connection.find({to_user_id: userId, status: 'pending'}).populate('from_user_id')
+        const pendingConnections = pendingConnectionsRequest.map(connection=>connection.from_user_id)
 
         res.json({success: true, connections, followers, following, pendingConnections})
 
@@ -291,7 +300,7 @@ export const acceptConnectionRequest = async (req, res) => {
         await user.save()
 
         const toUser = await User.findById(id)
-        toUser.connection.push(userId)
+        toUser.connections.push(userId)
         await toUser.save()
 
         connection.status = "accepted"

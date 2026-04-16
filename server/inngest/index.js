@@ -71,7 +71,7 @@ const syncUserDeletion = inngest.createFunction (
     }
 )
 
-// Inngest function to send remainder when a new connection request is added
+// Inngest function to send reminder when a new connection request is added
 const sendNewConnectionRequestReminder = inngest.createFunction (
     { id: "send-new-connection-request-reminder" },
     { event: "connection:request" },
@@ -80,6 +80,11 @@ const sendNewConnectionRequestReminder = inngest.createFunction (
 
         await step.run("send-connection-request-email", async () => {
             const connection = await Connection.findById(connectionId).populate('from_user_id to_user_id')
+            
+            if(!connection || !connection.from_user_id || !connection.to_user_id) {
+                return {message: "Connection or Users no longer exist"}
+            }
+
             const subject = `New connection request`
             const body = `
             <div style="font-family: sans-serif; padding: 20px; border: 1px solid #ddd; border-radius: 8px;">
@@ -100,11 +105,15 @@ const sendNewConnectionRequestReminder = inngest.createFunction (
 
         const in24Hours = new Date(Date.now() + 24 * 60 * 60 * 1000)
         await step.sleepUntil("wait for 24 hours", in24Hours)
-        await step.run("send-connection-request-remainder", async () => {
+        await step.run("send-connection-request-reminder", async () => {
             const connection = await Connection.findById(connectionId).populate('from_user_id to_user_id')
             
+            if(!connection || !connection.from_user_id || !connection.to_user_id) {
+                return {message: "Connection or Users no longer exist"}
+            }
+
             if(connection.status === "accepted") {
-                return {messege: "Already accepted"}
+                return {message: "Already accepted"}
             }
 
             const subject = `New connection request`
@@ -124,7 +133,7 @@ const sendNewConnectionRequestReminder = inngest.createFunction (
                 body
             })
 
-            return {messege: "Reminder sent"}
+            return {message: "Reminder sent"}
         })
     }
 )
