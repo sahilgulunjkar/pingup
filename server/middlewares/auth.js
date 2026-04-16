@@ -1,8 +1,6 @@
-import { response } from "express";
-
-export const protect = async (req, req, next) => {
+export const protect = async (req, res, next) => {
     try {
-        const {userId} = await req.auth();
+        const { userId } = req.auth();
         if(!userId) {
             return res.json({success:false, message: "not authenticated"})
         }

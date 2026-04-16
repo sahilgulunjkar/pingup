@@ -5,10 +5,11 @@ import connectDB from './configs/db.js'
 import { inngest, functions } from "./inngest/index.js"
 import { serve } from "inngest/express";
 import { clerkMiddleware } from '@clerk/express'
-
-dotenv.config()
+import userRouter from './routes/userRoutes.js'
 
 const app = express()
+
+dotenv.config()
 
 await connectDB();
 
@@ -21,6 +22,7 @@ app.get('/', (req, res) => {
 })
 
 app.use("/api/inngest", serve({ client: inngest, functions }));
+app.use("/api/user", userRouter)
 
 const port = process.env.PORT || 4000
 
