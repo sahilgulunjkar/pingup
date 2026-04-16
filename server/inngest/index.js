@@ -97,6 +97,35 @@ const sendNewConnectionRequestReminder = inngest.createFunction (
                 body
             })
         })
+
+        const in24Hours = new Date(Date.now() + 24 * 60 * 60 * 1000)
+        await step.sleepUntil("wait for 24 hours", in24Hours)
+        await step.run("send-connection-request-remainder", async () => {
+            const connection = await Connection.findById(connectionId).populate('from_user_id to_user_id')
+            
+            if(connection.status === "accepted") {
+                return {messege: "Already accepted"}
+            }
+
+            const subject = `New connection request`
+            const body = `
+            <div style="font-family: sans-serif; padding: 20px; border: 1px solid #ddd; border-radius: 8px;">
+                <h2>Hi ${connection.to_user_id.full_name}</h2>
+                <p>${connection.from_user_id.full_name} sent you a connection request</p>
+                <a href="${process.env.FRONTEND_URL}/connections" style="color:#10b981; text-decoration: none;"> View connection request</a>
+                <br>
+                <p>Thanks, PingUp Team</p>
+            </div>
+            `
+            
+            await sendEmail({
+                to: connection.to_user_id.email,
+                subject,
+                body
+            })
+
+            return {messege: "Reminder sent"}
+        })
     }
 )
 
