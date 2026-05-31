@@ -3,6 +3,7 @@ import client from "../configs/imageKit.js"
 import Connection from "../models/Connection.js"
 import fs from "fs"
 import { clerkClient } from "@clerk/express"
+import Post from '../models/Posts.js'
 
 // Get user data using userId
 export const getUserData = async (req, res) => {
@@ -62,21 +63,31 @@ export const updateUserData = async (req, res) => {
         }
 
         // 1. FIX: Check field names carefully
-        let profile_picture_file = req.files?.find(f => f.fieldname === 'profile_picture');
-        // Your log showed 'cover', so we check for both to be safe
-        let cover_photo_file = req.files?.find(f => f.fieldname === 'cover_photo' || f.fieldname === 'cover');
+        let profile_picture_file = Array.isArray(req.files) 
+            ? req.files.find(f => f.fieldname === 'profile_picture' || f.fieldname === 'profile')
+            : req.files?.['profile']?.[0] || req.files?.['profile_picture']?.[0];
+
+        let cover_photo_file = Array.isArray(req.files)
+            ? req.files.find(f => f.fieldname === 'cover_photo' || f.fieldname === 'cover')
+            : req.files?.['cover']?.[0] || req.files?.['cover_photo']?.[0];
 
         // Handle Profile Picture
         if (profile_picture_file && fs.existsSync(profile_picture_file.path)) {
             const buffer = fs.readFileSync(profile_picture_file.path);
             
             const response = await client.files.upload({
-                file: buffer, // This must be the Buffer
+                file: buffer.toString("base64"), // Convert to Base64
                 fileName: profile_picture_file.originalname,
             });
 
-            updatedData.profile_picture = client.url({
-                path: response.filePath,
+            // Delete the temporary file from the disk
+            if (fs.existsSync(profile_picture_file.path)) {
+                fs.unlinkSync(profile_picture_file.path);
+            }
+
+            updatedData.profile_picture = client.helper.buildSrc({
+                urlEndpoint: process.env.IMAGEKIT_URL_ENDPOINT,
+                src: response.filePath,
                 transformation: [
                     { width: "512" },
                     { quality: "auto" },
@@ -90,12 +101,18 @@ export const updateUserData = async (req, res) => {
             const buffer = fs.readFileSync(cover_photo_file.path);
             
             const response = await client.files.upload({
-                file: buffer, 
+                file: buffer.toString("base64"), // Convert to Base64
                 fileName: cover_photo_file.originalname,
             });
 
-            updatedData.cover_photo = client.url({
-                path: response.filePath,
+            // Delete the temporary file from the disk
+            if (fs.existsSync(cover_photo_file.path)) {
+                fs.unlinkSync(cover_photo_file.path);
+            }
+
+            updatedData.cover_photo = client.helper.buildSrc({
+                urlEndpoint: process.env.IMAGEKIT_URL_ENDPOINT,
+                src: response.filePath,
                 transformation: [
                     { width: 1280 },
                     { quality: "auto" },
@@ -285,7 +302,7 @@ export const getUserConnections=async(req,res)=>{
 }
 
 // Accept connection request
-export const acceptConnectionRequest=async(req,res)=>{
+export const acceptConnectionRequest = async(req, res)=>{
   try {
     const { userId } =  req.auth();
     const {id}=req.body;
@@ -314,5 +331,21 @@ export const acceptConnectionRequest=async(req,res)=>{
   } catch (error) {
     console.log(error);
     res.json({success:false,message:error.message});
+  }
+}
+
+// get user profile
+export const getUserProfiles = async(req, res) => {
+  try {
+    const { profileId } = req.body;
+    const profile = await User.findById(profileId);
+    if(!profile)return res.json({success:false,message:"Profile not found"});
+
+    const posts = await Post.find({user:profileId}).populate('user');
+    
+    return res.json({success:true, profile, posts});
+  } catch (error) {
+    console.log(error);
+    return res.json({success:false, message:error.message});
   }
 }
