@@ -267,7 +267,7 @@ export const sendConnectionRequest = async (req, res) => {
         // Trigger Inngest event for connection reminder
         const { inngest } = await import("../inngest/index.js")
         await inngest.send({
-            name: "connection:request",
+            name: "app/connection.request",
             data: { connectionId: connection._id }
         })
 
