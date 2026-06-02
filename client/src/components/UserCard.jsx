@@ -1,10 +1,10 @@
 import React from 'react'
-import { dummyUserData } from '../assets/assets'
 import { MapPin, MessageCircle, UserPlus, Plus } from 'lucide-react'
+import { useSelector } from 'react-redux'
 
 const UserCard = ({ user }) => {
 
-    const currentUser = dummyUserData
+    const currentUser = useSelector((state) => state.user.value)
     const handleConnectionRequest = async (e) => {
         e.preventDefault()
 
@@ -41,9 +41,9 @@ const UserCard = ({ user }) => {
                 {/* Follow Button */}
                 <button
                     className='w-full py-2 rounded-md flex justify-center items-center gap-2 bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 active:scale-95 transition text-white cursor-pointer'
-                    disabled={currentUser?.following.includes(user._id)}
+                    disabled={currentUser?.following?.includes(user._id)}
                     onClick={handleFollow}>
-                    <UserPlus className='w-4 h-4' /> {currentUser?.following.includes(user._id) ? 'Following' : 'Follow'}
+                    <UserPlus className='w-4 h-4' /> {currentUser?.following?.includes(user._id) ? 'Following' : 'Follow'}
                 </button>
 
 
@@ -52,7 +52,7 @@ const UserCard = ({ user }) => {
                     onClick={handleConnectionRequest}
                     className='flex items-center justify-center w-16 border text-slate-500 group rounded-md cursor-pointer active:scale-95 trasition'>
                     {
-                        currentUser?.connections.includes(user._id) ?
+                        currentUser?.connections?.includes(user._id) ?
                             <MessageCircle className='w-5 h-5 group-hover:scale-105 transition' /> :
                             <Plus className='w-5 h-5 group-hover:scale-105 transition' />
                     }

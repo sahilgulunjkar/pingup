@@ -1,13 +1,13 @@
-import React from "react";
 import { assets } from "../assets/assets";
 import { Link, useNavigate } from "react-router-dom";
 import MenuItems from "./MenuItems";
 import { CirclePlus, LogOut } from "lucide-react";
-import { UserButton, useClerk, useUser } from "@clerk/clerk-react";
+import { UserButton, useClerk } from "@clerk/clerk-react";
+import { useSelector } from 'react-redux'
 
 const Sidebar = ({ SidebarOpen, setSidebarOpen }) => {
     const navigate = useNavigate();
-    const { user } = useUser();
+    const user = useSelector((state) => state.user.value);
     const { signOut } = useClerk();
 
     return (
@@ -44,8 +44,8 @@ const Sidebar = ({ SidebarOpen, setSidebarOpen }) => {
                 <div className="flex gap-2 items-center cursor-pointer">
                     <UserButton />
                     <div>
-                        <h1 className="text-sm font-medium"> {user?.fullName} </h1>
-                        <p className="text-xs text-gray-500"> @{user?.fullName} </p>
+                        <h1 className="text-sm font-medium"> {user?.full_name} </h1>
+                        <p className="text-xs text-gray-500"> @{user?.full_name} </p>
                     </div>
                 </div>
                 <LogOut
