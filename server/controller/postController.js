@@ -82,12 +82,12 @@ export const likePost = async (req, res) => {
     const post = await Post.findById(postId);
     if (!post) return res.status(404).json({ success: false, message: "Post not found" });
 
-    if (post.likes_count.includes(userId)) {
-      post.likes_count = post.likes_count.filter((id) => id.toString() !== userId);
+    if (post.likes.includes(userId)) {
+      post.likes = post.likes.filter((id) => id.toString() !== userId);
       await post.save();
       return res.json({ success: true, message: "Post unliked" });
     } else {
-      post.likes_count.push(userId);
+      post.likes.push(userId);
       await post.save();
       return res.json({ success: true, message: "Post liked" });
     }
