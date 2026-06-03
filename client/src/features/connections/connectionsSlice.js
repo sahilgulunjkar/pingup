@@ -8,10 +8,9 @@ const initialState = {
   following:[],
 };
 
-export const fetchConnections = createAsyncThunk('connections/fetchConnections',
-  async(token) => {
-    const {data}=await api.get("/api/user/connections",{
-      headers:{
+export const fetchConnections = createAsyncThunk('connections/fetchConnections', async(token) => {
+    const {data} = await api.get("/api/user/connections", {
+      headers: {
         Authorization:`Bearer ${token}`
       }
     })
@@ -19,25 +18,24 @@ export const fetchConnections = createAsyncThunk('connections/fetchConnections',
   }
 )
 
-const connectionsSlice=createSlice({
-  name:'connections',
+const connectionsSlice = createSlice({
+  name: 'connections',
   initialState,
-  reducers:{
+  reducers: {
     
   },
-  extraReducers:(builder) => {
-   builder
-   .addCase(fetchConnections.fulfilled,(state,action)=>{
+
+  extraReducers: (builder) => {
+   builder.addCase(fetchConnections.fulfilled, (state,action) => {
     if(action.payload){
-      state.connections=action.payload.connections
-      state.pendingConnections=action.payload.pendingConnections
-      state.followers=action.payload.followers
-      state.following=action.payload.following
+      state.connections = action.payload.connections
+      state.pendingConnections = action.payload.pendingConnections
+      state.followers = action.payload.followers
+      state.following = action.payload.following
     }
    })
-   
+
   }
 });
 
-const connectionsReducer=connectionsSlice.reducer
-export default connectionsReducer;
+export default connectionsSlice.reducer;
