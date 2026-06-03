@@ -1,10 +1,15 @@
 import React, { useState } from 'react'
 import { Pencil } from 'lucide-react'
-import { useSelector } from 'react-redux'
+import { useSelector, useDispatch } from 'react-redux'
+import { updateUser } from '../features/user/userSlice'
+import { useAuth } from '@clerk/clerk-react'
+import toast from 'react-hot-toast'
 
 const ProfileModal = ({ setShowEdit }) => {
 
   const user = useSelector((state) => state.user.value)
+  const dispatch = useDispatch()
+  const { getToken } = useAuth()
 
   const [editForm, setEditForm] = useState({
     username: user.username,
@@ -17,7 +22,27 @@ const ProfileModal = ({ setShowEdit }) => {
 
   const handleSaveProfile = async (e) => {
     e.preventDefault()
-    setShowEdit(false)
+    try {
+      const userData = new FormData()
+      userData.append('username', editForm.username)
+      userData.append('bio', editForm.bio)
+      userData.append('location', editForm.location)
+      userData.append('profile', editForm.profile_picture)
+      userData.append('cover', editForm.cover_photo)
+      userData.append('full_name', editForm.full_name)
+
+      const token = await getToken()
+      const resultAction = await dispatch(updateUser({userData, token}))
+
+      if (updateUser.fulfilled.match(resultAction) && resultAction.payload) {
+        setShowEdit(false)
+        return resultAction.payload
+      } else {
+        throw new Error('Failed to update profile')
+      }
+    } catch (error) {
+      throw new Error(error.message || 'Failed to update profile')
+    }
   }
 
   return (
@@ -31,7 +56,14 @@ const ProfileModal = ({ setShowEdit }) => {
             Edit Profile
           </h1>
 
-          <form className='space-y-5' onSubmit={handleSaveProfile}>
+          <form className='space-y-5' onSubmit={e => toast.promise(
+            handleSaveProfile(e),
+            {
+              loading: 'Saving...',
+              success: 'Profile updated successfully',
+              error: 'Failed to update profile'
+            }
+          )}>
 
             {/* Profile Picture */}
             <div>
