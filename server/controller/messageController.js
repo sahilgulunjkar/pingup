@@ -65,13 +65,15 @@ export const sendMessage = async (req, res) => {
       }
     }
 
-    const message = await Message.create({
+    let message = await Message.create({
       from_user_id: userId,
       to_user_id,
       text,
       message_type,
       media_url,
     });
+
+    message = await message.populate("from_user_id");
 
     if (connections[to_user_id]) {
       connections[to_user_id].write(`data: ${JSON.stringify(message)}\n\n`);

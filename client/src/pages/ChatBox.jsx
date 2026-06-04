@@ -128,7 +128,8 @@ const ChatBox = () => {
           {[...messages]
             .sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt))
             .map((message, index) => {
-              const isReceived = message.from_user_id !== clerkUser?.id
+              const fromUserId = typeof message.from_user_id === 'object' ? message.from_user_id._id : message.from_user_id
+              const isReceived = fromUserId !== clerkUser?.id
               return (
                 <div
                   key={index}

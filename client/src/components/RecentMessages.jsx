@@ -1,21 +1,61 @@
 import React, { useState, useEffect } from 'react'
-import { dummyRecentMessagesData } from '../assets/assets'
 import { Link } from 'react-router-dom'
 import moment from 'moment'
+import { useUser } from '@clerk/clerk-react'
+import { useAuth } from '@clerk/clerk-react'
+import api from '../api/axios'
+import toast from 'react-hot-toast'
+
 const RecentMessages = () => {
 
-   const [messages, setMessages] = useState([])
-   const fetchRecentMessages = async () => {
-      setMessages(dummyRecentMessagesData)
-   }
+  const [messages, setMessages] = useState([])
+  const {user} = useUser()
+  const {getToken} = useAuth()
 
-    useEffect(() => {
-        fetchRecentMessages()
-    }, [])
+  const fetchRecentMessages = async () => {
+    try {
+      const token = await getToken()
+      const { data } = await api.post('/api/user/recent-messages', {}, {
+        headers: {
+          Authorization: `Bearer ${token}`}
+      })
+
+      if(data.success){
+        const groupMessages = data.messages.reduce((acc, message) => {
+          const senderId = message.from_user_id._id
+          if(!acc[senderId] || new Date(message.createdAt) > new Date(acc[senderId].createdAt)){
+            acc[senderId] = message;
+          }
+          return acc;
+        }, {})
+
+        // sort messages by date
+        const sortedMessages = Object.values(groupMessages).sort((a, b) =>
+        new Date(b.createdAt) - new Date(a.createdAt)
+        )
+        setMessages(sortedMessages)
+      } else {
+        toast.error(data.message)  
+      }
+    } catch (error) {
+      toast.error(error.message)
+    }
+  }
+
+  useEffect(() => {
+    if(user) {
+      fetchRecentMessages()
+      const interval = setInterval(fetchRecentMessages, 30000) // refreshes every 30 seconds
+      return () => {
+        clearInterval(interval)
+      }
+    }
+  }, [user])
+
    return (  
     <div className='bg-white max-w-xs mt-4 p-4 min-h-20 rounded-md shadow text-xs
     text-slate-800'>
-     <h3 className='font-semibold text-slate-8 mb-4'>recent messages</h3>
+     <h3 className='font-semibold text-slate-800 mb-4'>recent messages</h3>
      <div className="flex flex-col max-h-60 overflow-y-scroll no-scrollbar">
         {
             messages.map((msg, index) => (
@@ -27,7 +67,7 @@ const RecentMessages = () => {
                   <p className="text-[10px] text-slate-400">{moment(msg.createdAt).fromNow()}</p>
                 </div>
                 <div>
-                  <p className='text-grey-500'>{msg.text ? msg.text:'Media'}</p>
+                  <p className='text-gray-500'>{msg.text ? msg.text:'Media'}</p>
                 </div>
                 </div>
                 {!msg.seen && <p className='bg-indigo-500 text-white w-4 h-4 flex items-center justify-center rounded-full text-[10px] flex-shrink-0'>1</p>}
