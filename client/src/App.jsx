@@ -44,10 +44,6 @@ export const App = () => {
     pathnameRef.current = pathname;
   }, [pathname])
 
-  if (!isLoaded) {
-    return <Loading />
-  }
-
   useEffect(() => {
     if (user) {
       const eventSource = new EventSource(import.meta.env.VITE_BASE_URL + '/api/message/' + user.id)
@@ -78,6 +74,10 @@ export const App = () => {
       }
     } 
   }, [user, dispatch])
+
+  if (!isLoaded) {
+    return <Loading />
+  }
 
   return (
     <>
