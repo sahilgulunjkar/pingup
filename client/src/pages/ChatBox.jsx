@@ -67,14 +67,37 @@ const ChatBox = () => {
   }, [userId])
 
   useEffect(() => {
-    if (connections.length > 0) {
-      const user = connections.find(connection => connection._id === userId)
-      setUser(user)
+    const getRecipientUser = async () => {
+      // 1. Try to find in connections first
+      if (connections.length > 0) {
+        const found = connections.find(connection => connection._id === userId)
+        if (found) {
+          setUser(found)
+          return
+        }
+      }
+
+      // 2. Fallback: Fetch from API if not found or connections not loaded
+      if (userId) {
+        try {
+          const token = await getToken()
+          const { data } = await api.post(`/api/user/profiles`, { profileId: userId }, {
+            headers: { Authorization: `Bearer ${token}` }
+          })
+          if (data.success) {
+            setUser(data.profile)
+          }
+        } catch (error) {
+          console.error("Error fetching recipient profile:", error)
+        }
+      }
     }
-  }, [connections, userId])
+
+    getRecipientUser()
+  }, [connections, userId, getToken])
 
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
+    messageEndRef.current?.scrollIntoView({ behavior: "smooth" })
   }, [messages])
 
   return user && (
@@ -169,7 +192,7 @@ const ChatBox = () => {
 
           </label>
           <button onClick={sendMessage} className='bg-gradient-to-br from-indigo-500 to-purple-600
-          hover: from-indigo-700 hover: to-purple-800 active: scale-95 
+          hover:from-indigo-700 hover:to-purple-800 active:scale-95 
           cursor-pointer text-white p-2 rounded-full'>
             <SendHorizonal size={18} />
           </button>
