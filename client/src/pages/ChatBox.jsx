@@ -1,27 +1,81 @@
 import React, { useState, useRef, useEffect } from 'react'
 import { useParams } from 'react-router-dom'
 import { ImageIcon, SendHorizonal } from "lucide-react"
-import { dummyMessagesData, dummyUserData, dummyConnectionsData } from '../assets/assets'
+import { useSelector, useDispatch } from 'react-redux'
+import { useAuth, useUser } from '@clerk/clerk-react'
+import api from '../api/axios'
+import { addMessage, fetchMessages, resetMessages, updateMessage, deleteMessage } from '../features/messages/messagesSlice'
+import toast from 'react-hot-toast'
 
 const ChatBox = () => {
 
+  const { messages } = useSelector((state) => state.messages)
+  const { user: clerkUser } = useUser()
   const { userId } = useParams()
-
-  const messages = dummyMessagesData
+  const { getToken } = useAuth()
+  const dispatch = useDispatch()
 
   const [text, setText] = useState('')
   const [image, setImage] = useState(null)
-
-  const user =
-    dummyConnectionsData.find(u => u._id === userId) || dummyUserData
-
+  const [user, setUser] = useState(null)
   const messageEndRef = useRef(null)
 
-  const sendMessage = async () => { }
+  const connections = useSelector((state) => state.connections.connections)
+
+  const fetchUserMessages = async () => {
+    try {
+      const token = await getToken()
+      dispatch(fetchMessages({ token, userId }))
+    } catch (error) {
+      toast.error(error.message)
+    }
+  }
+
+  const sendMessage = async () => {
+    try {
+      if (!text && !image) return
+
+      const token = await getToken()
+      const formData = new FormData()
+
+      formData.append("to_user_id", userId)
+      formData.append("text", text)
+      if (image) formData.append("media", image)
+
+      const { data } = await api.post('/api/message/send', formData, {
+        headers: { Authorization: `Bearer ${token}` }
+      })
+
+      if (data.success) {
+        setText('')
+        setImage(null)
+        dispatch(addMessage(data.message))
+      } else {
+        throw new Error(data.message)
+      }
+
+    } catch (error) {
+      toast.error(error.message)
+    }
+  }
 
   useEffect(() => {
-    messageEndRef.current?.scrollIntoView({ behavior: "smooth" })
-  }, [messages.length])
+    fetchUserMessages()
+    return () => {
+      dispatch(resetMessages())
+    }
+  }, [userId])
+
+  useEffect(() => {
+    if (connections.length > 0) {
+      const user = connections.find(connection => connection._id === userId)
+      setUser(user)
+    }
+  }, [connections, userId])
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
+  }, [messages])
 
   return user && (
     <div className='flex flex-col h-screen'>
@@ -45,45 +99,36 @@ const ChatBox = () => {
       </div>
 
       {/* MESSAGES */}
-      <div className='p-5 md:px-10 h-full overflow-y-auto'>
+      <div className='p-5 md:px-10 h-full overflow-y-auto bg-slate-50'>
         <div>
 
           {[...messages]
             .sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt))
-            .map((message, index) => (
-
-              <div
-                key={index}
-                className={`flex flex-col mb-3 ${message.from_user_id === dummyUserData._id
-                    ? 'items-start'
-                    : 'items-end'
-                  }`}
-              >
-
+            .map((message, index) => {
+              const isReceived = message.from_user_id !== clerkUser?.id
+              return (
                 <div
-                  className={`p-2 text-sm max-w-sm bg-white text-slate-700 rounded-lg shadow ${message.from_user_id === dummyUserData._id
-                      ? 'rounded-bl-none'
-                      : 'rounded-br-none'
-                    }`}
+                  key={index}
+                  className={`flex flex-col mb-3 ${isReceived ? 'items-start' : 'items-end'}`}
                 >
-
-                  {message.message_type === 'image' && (
-                    <img
-                      src={message.media_url}
-                      className='w-full max-w-sm rounded-lg mb-1'
-                      alt=""
-                    />
-                  )}
-
-                  <p>{message.text}</p>
-
+                  <div
+                    className={`p-2 text-sm max-w-sm rounded-lg shadow ${isReceived
+                        ? 'bg-white text-slate-700 rounded-bl-none'
+                        : 'bg-blue-500 text-white rounded-br-none'
+                      }`}
+                  >
+                    {message.message_type === 'image' && (
+                      <img
+                        src={message.media_url}
+                        className='w-full max-w-sm rounded-lg mb-1'
+                        alt=""
+                      />
+                    )}
+                    <p>{message.text}</p>
+                  </div>
                 </div>
-
-              </div>
-
-            ))}
-
-          <div ref={messageEndRef} />
+              )
+            })}<div ref={messageEndRef} />
 
         </div>
       </div>

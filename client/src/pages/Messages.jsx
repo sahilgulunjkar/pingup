@@ -1,10 +1,13 @@
 import React from 'react'
-import { dummyConnectionsData } from '../assets/assets'
 import { Eye, MessageSquare } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
+import { useSelector } from 'react-redux'
 
 const Messages = () => {
-   const navigate = useNavigate()
+
+  const { connections } = useSelector((state) => state.connections)
+  const navigate = useNavigate()
+  
   return (
     <div className="p-6 max-w-3xl">
       {/* Header */}
@@ -15,7 +18,7 @@ const Messages = () => {
 
       {/* Messages List */}
       <div className="flex flex-col gap-4">
-        {dummyConnectionsData.map((user) => (
+        {connections.map((user) => (
           <div key={user._id} className="bg-white rounded-xl p-4 flex items-start gap-4 cursor-pointer hover:shadow-md transition-shadow border border-gray-100"
           >
             {/* Avatar */}

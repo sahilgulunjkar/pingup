@@ -1,6 +1,8 @@
 import { ArrowLeft, TextIcon, Upload, Sparkle } from 'lucide-react'
 import React, { useState } from 'react'
 import toast from 'react-hot-toast'
+import { useAuth } from '@clerk/clerk-react'
+import api from '../api/axios'
 
 const StoryModel = ({ setShowModel, fetchStories }) => {
 
@@ -16,17 +18,76 @@ const StoryModel = ({ setShowModel, fetchStories }) => {
     const [media, setMedia] = useState(null)
     const [preview, setPreview] = useState(null)
 
+    const { getToken } = useAuth()
+    const MAX_VIDEO_DURATION = 60    // seconds
+    const MAX_VIDEO_SIZE = 50       // mb
+
+
     const handleMediaUpload = (e) => {
         const file = e.target.files?.[0]
         if (file) {
-            setMedia(file)
-            setPreview(URL.createObjectURL(file))
+            if (file.type.startsWith("video/")) {
+                if (file.size > MAX_VIDEO_SIZE * 1024 * 1024) {
+                    toast.error(`Video size must be less than ${MAX_VIDEO_SIZE}MB`)
+                    setMedia(null);
+                    setPreview(null)
+                    return
+                }
+                const video = document.createElement('video')
+
+                video.preload = 'metadata'
+                video.onloadedmetadata = () => {
+                    window.URL.revokeObjectURL(video.src)
+                    if(video.duration > MAX_VIDEO_DURATION) {
+                        toast.error(`Video duration must be less than ${MAX_VIDEO_DURATION}seconds`)
+                        setMedia(null);
+                        setPreview(null)
+                        return
+                    } else {
+                        setMedia(file)
+                        setPreview(URL.createObjectURL(file))
+                        setText("")
+                        setMode("media")
+                    }
+                }
+                video.src = URL.createObjectURL(file)
+            
+            } else if (file.type.startsWith("image")) {
+                setMedia(file)
+                setPreview(URL.createObjectURL(file))
+                setText("")
+                setMode("media")
+            }
         }
     }
 
-    // TODO - handle backend
-    const handleCreateStory = () => {
+    const handleCreateStory = async () => {
+        const media_type = mode === 'media' ? (media.type.startsWith('image') ? "image" : "video") : "text"
+        
+        if(media_type === "text" && !text) {
+            throw new Error("Please enter text to create a story")
+        }
+        
+        let formData = new FormData();
+        formData.append('content', text)
+        formData.append('media_type', media_type)
+        formData.append('media', media)
+        formData.append('background_color', background)
+        
+        const token = await getToken()
+        const {data} = await api.post('/api/story/create', formData, {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        })
 
+        if(data.success) {
+            setShowModel(false)
+            fetchStories()
+            return data.message || "Story created successfully!"
+        } else {
+            throw new Error(data.message || "Failed to create story")
+        }
     }
 
     return (
@@ -117,8 +178,8 @@ const StoryModel = ({ setShowModel, fetchStories }) => {
                     className='w-full h-12 bg-zinc-800 text-white p-2 rounded mt-4 flex items-center justify-center gap-2 cursor-pointer'
                     onClick={() => toast.promise(handleCreateStory(), {
                         loading: "Creating story...",
-                        success: "Story created successfully!",
-                        error: "Failed to create story!"
+                        success: (msg) => msg,
+                        error: (err) => err.message || "Failed to create story!"
                     })}
                 >
                     <Sparkle size={18} /> Create Story

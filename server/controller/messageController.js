@@ -40,7 +40,7 @@ export const sendMessage = async (req, res) => {
     if (file) {
       try {
         const base64File = fs.readFileSync(file.path, "base64");
-        const response = await imagekit.upload({
+        const response = await imagekit.files.upload({
           file: base64File,
           fileName: file.originalname,
           useUniqueFileName: true,
@@ -49,8 +49,9 @@ export const sendMessage = async (req, res) => {
 
         if (file.mimetype.startsWith("image")) {
           message_type = "image";
-          media_url = imagekit.url({
-            path: response.filePath,
+          media_url = imagekit.helper.buildSrc({
+            urlEndpoint: process.env.IMAGEKIT_URL_ENDPOINT,
+            src: response.filePath,
             transformation: [{ quality: "auto" }, { format: "webp" }, { width: "1280" }],
           });
         } else if (file.mimetype.startsWith("video")) {

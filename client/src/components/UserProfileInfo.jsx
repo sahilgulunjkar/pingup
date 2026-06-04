@@ -67,7 +67,7 @@ const UserProfileInfo = ({ user, posts, profileId, setShowEdit }) => {
 
                         <div className="flex flex-col items-center">
                             <span className='sm:text-xl font-bold text-gray-900'>
-                                {user.followers.length}
+                                {user.followers?.length || 0}
                             </span>
                             <span className='text-xs sm:text-sm text-gray-500'>
                                 Followers
@@ -76,7 +76,7 @@ const UserProfileInfo = ({ user, posts, profileId, setShowEdit }) => {
 
                         <div className="flex flex-col items-center">
                             <span className='sm:text-xl font-bold text-gray-900'>
-                                {user.following.length}
+                                {user.following?.length || 0}
                             </span>
                             <span className='text-xs sm:text-sm text-gray-500'>
                                 Following
