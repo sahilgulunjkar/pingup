@@ -1,19 +1,14 @@
-// src/features/messages/messageSlice.js
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import api from "../../api/axios";
 import toast from "react-hot-toast";
 
 const initialState = { messages: [] };
 
-export const fetchMessages = createAsyncThunk(
-  "messages/fetchMessages",
-  async ({ token, userId }) => {
+export const fetchMessages = createAsyncThunk ( "messages/fetchMessages", async ({ token, userId }) => {
     try {
-      const { data } = await api.post(
-        "/api/message/get",
-        { to_user_id: userId },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      const { data } = await api.post("/api/message/get", {to_user_id: userId}, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
       return data.success ? data : { success: false, messages: [] };
     } catch (error) {
       toast.error(error.message);
@@ -44,7 +39,6 @@ const messageSlice = createSlice({
   },
 });
 
-// ✅ export ALL actions you use
 export const {
   addMessage,
   setMessages,
